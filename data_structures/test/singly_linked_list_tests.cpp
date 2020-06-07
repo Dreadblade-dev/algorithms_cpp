@@ -72,6 +72,8 @@ namespace SinglyLinkedListTest
 		EXPECT_TRUE(list.contains(45));
 		list.remove(45);
 		EXPECT_FALSE(list.contains(45));
+
+		EXPECT_THROW(list.remove(256), ListEmptyException);
 	}
 	
 	TEST(SinglyLinkedListTest, SinglyLinkedListInsertAtStart)
@@ -103,6 +105,8 @@ namespace SinglyLinkedListTest
 		list.deleteAtStart();
 		EXPECT_FALSE(list.contains(512));
 		EXPECT_TRUE(list.contains(256));
+		list.deleteAtStart();
+		EXPECT_THROW(list.deleteAtStart(), ListEmptyException);
 	}
 
 	TEST(SinglyLinkedListTest, SinglyLinkedListDeleteAtEnd)
@@ -114,5 +118,59 @@ namespace SinglyLinkedListTest
 		list.deleteAtEnd();
 		EXPECT_FALSE(list.contains(256));
 		EXPECT_TRUE(list.contains(512));
+		list.deleteAtEnd();
+		EXPECT_THROW(list.deleteAtEnd(), ListEmptyException);
+	}
+
+	TEST(SinglyLinkedListTest, SinglyLinkedListCopyConstructor)
+	{
+		SinglyLinkedList<int16_t> list;
+		list.insertAtEnd(128);
+		list.insertAtEnd(256);
+		list.insertAtEnd(384);
+		list.insertAtEnd(512);
+		
+		SinglyLinkedList<int16_t> list1(list);
+		
+		list.clear();
+		
+		EXPECT_TRUE(list.isEmpty());
+		EXPECT_FALSE(list1.isEmpty());
+		EXPECT_TRUE(list1.contains(128));
+		EXPECT_TRUE(list1.contains(256));
+		EXPECT_TRUE(list1.contains(384));
+		EXPECT_TRUE(list1.contains(512));
+
+		list.insertAtEnd(128);
+		SinglyLinkedList<int16_t> list2(list);
+		EXPECT_TRUE(list2.contains(128));
+	}
+
+	TEST(SinglyLinkedListTest, SinglyLinkedListEqualOperator)
+	{
+
+		SinglyLinkedList<int16_t> list;
+		list.insertAtEnd(128);
+		list.insertAtEnd(256);
+		list.insertAtEnd(384);
+		list.insertAtEnd(512);
+
+		SinglyLinkedList<int16_t> list1 = list;
+		
+		list1 = list1; 
+		
+		list.clear();
+
+		EXPECT_TRUE(list.isEmpty());
+		EXPECT_FALSE(list1.isEmpty());
+		EXPECT_TRUE(list1.contains(128));
+		EXPECT_TRUE(list1.contains(256));
+		EXPECT_TRUE(list1.contains(384));
+		EXPECT_TRUE(list1.contains(512));
+
+		list1.clear();
+		list.insertAtEnd(128);
+		list1 = list;
+		EXPECT_TRUE(list1.contains(128));
 	}
 }

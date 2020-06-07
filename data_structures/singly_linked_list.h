@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <exception>
 
 /**
  * @author Dreadblade- (https://github.com/Dreadblade-dev)
@@ -33,26 +34,68 @@ private:
 	Node<T>* m_head;
 public:
 	SinglyLinkedList();
+	SinglyLinkedList(SinglyLinkedList& list);
 	~SinglyLinkedList();
-	bool isEmpty();
-	bool contains(const T& item);
-	void clear();
+	bool isEmpty() noexcept;
+	bool contains(const T& item) noexcept;
+	void clear() noexcept;
 	void remove(const T& item);
-	void insertAtStart(const T& item);
-	void insertAtEnd(const T& item);
+	void insertAtStart(const T& item) noexcept;
+	void insertAtEnd(const T& item) noexcept;
 	void deleteAtStart();
 	void deleteAtEnd();
 
+	SinglyLinkedList& operator=(SinglyLinkedList& list);
+	
 	template <class T>
 	friend std::ostream& operator<<(std::ostream& out, SinglyLinkedList<T>& list);
 };
 
+class ListEmptyException : public std::exception
+{
+public:
+	const char* what() const override
+	{
+		return "List is empty";
+	}
+};
 
 template <class T>
 SinglyLinkedList<T>::SinglyLinkedList(): m_head(nullptr)
 {
 
 }
+
+template <class T>
+SinglyLinkedList<T>::SinglyLinkedList(SinglyLinkedList& list)
+{
+	if (list.isEmpty())
+	{
+		m_head = nullptr;
+		return;
+	}
+	
+	auto currentNode = new Node<T>;
+	auto prevNode = currentNode;
+	auto nodeToCopy = list.m_head;
+
+	m_head = currentNode;
+	
+	currentNode->data = nodeToCopy->data;
+	prevNode->next = currentNode;
+	nodeToCopy = nodeToCopy->next;
+	
+	while (nodeToCopy != nullptr)
+	{
+		currentNode = new Node<T>;
+		currentNode->data = nodeToCopy->data;
+		prevNode->next = currentNode;
+		prevNode = currentNode;
+		nodeToCopy = nodeToCopy->next;
+	}
+	currentNode->next = nullptr;
+}
+
 
 template <class T>
 SinglyLinkedList<T>::~SinglyLinkedList()
@@ -73,13 +116,13 @@ SinglyLinkedList<T>::~SinglyLinkedList()
 }
 
 template <class T>
-bool SinglyLinkedList<T>::isEmpty()
+bool SinglyLinkedList<T>::isEmpty() noexcept
 {
 	return (m_head == nullptr);
 }
 
 template <class T>
-bool SinglyLinkedList<T>::contains(const T& item)
+bool SinglyLinkedList<T>::contains(const T& item) noexcept
 {
 	if (isEmpty())
 		return false;
@@ -102,7 +145,7 @@ bool SinglyLinkedList<T>::contains(const T& item)
 }
 
 template <class T>
-void SinglyLinkedList<T>::clear()
+void SinglyLinkedList<T>::clear() noexcept
 {
 	if (isEmpty())
 		return;
@@ -124,7 +167,7 @@ template <class T>
 void SinglyLinkedList<T>::remove(const T& item)
 {
 	if (isEmpty())
-		return;
+		throw ListEmptyException();
 
 	auto nodeToRemove = m_head;
 	auto nodeToChangeNext = m_head;
@@ -159,7 +202,7 @@ void SinglyLinkedList<T>::remove(const T& item)
 }
 
 template <class T>
-void SinglyLinkedList<T>::insertAtStart(const T& item)
+void SinglyLinkedList<T>::insertAtStart(const T& item) noexcept
 {
 	if (!isEmpty())
 	{
@@ -179,7 +222,7 @@ void SinglyLinkedList<T>::insertAtStart(const T& item)
 }
 
 template <class T>
-void SinglyLinkedList<T>::insertAtEnd(const T& item)
+void SinglyLinkedList<T>::insertAtEnd(const T& item) noexcept
 {
 	if (!isEmpty())
 	{
@@ -201,7 +244,7 @@ template <class T>
 void SinglyLinkedList<T>::deleteAtStart()
 {
 	if (isEmpty())
-		return;
+		throw ListEmptyException();
 
 	auto tmp = m_head->next;
 	delete m_head;
@@ -212,7 +255,7 @@ template <class T>
 void SinglyLinkedList<T>::deleteAtEnd()
 {
 	if (isEmpty())
-		return;
+		throw ListEmptyException();
 
 	if (m_head->next == nullptr)
 	{
@@ -234,10 +277,7 @@ template <class T>
 std::ostream& operator<<(std::ostream& out, SinglyLinkedList<T>& list)
 {
 	if (list.isEmpty())
-	{
-		out << "List is empty.";
-		return out;
-	}
+		throw ListEmptyException();
 
 	auto currentNode = list.m_head;
 	while (currentNode->next != nullptr)
@@ -249,4 +289,39 @@ std::ostream& operator<<(std::ostream& out, SinglyLinkedList<T>& list)
 	out << currentNode->data;
 
 	return out;
+}
+
+template <class T>
+SinglyLinkedList<T>& SinglyLinkedList<T>::operator=(SinglyLinkedList& list)
+{
+	if (this == &list)
+		return *this;
+	
+	if (list.isEmpty())
+	{
+		m_head = nullptr;
+		return *this;
+	}
+
+	auto currentNode = new Node<T>;
+	auto prevNode = currentNode;
+	auto nodeToCopy = list.m_head;
+
+	m_head = currentNode;
+
+	currentNode->data = nodeToCopy->data;
+	prevNode->next = currentNode;
+	nodeToCopy = nodeToCopy->next;
+
+	while (nodeToCopy != nullptr)
+	{
+		currentNode = new Node<T>;
+		currentNode->data = nodeToCopy->data;
+		prevNode->next = currentNode;
+		prevNode = currentNode;
+		nodeToCopy = nodeToCopy->next;
+	}
+	currentNode->next = nullptr;
+
+	return *this;
 }
