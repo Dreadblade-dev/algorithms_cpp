@@ -1,8 +1,6 @@
 #pragma once
 #include <iostream>
-#include <exception>
-#include <cassert>
-#include <cstdint>
+#include "exceptions.h"
 
 /**
  * @author Dreadblade- (https://github.com/Dreadblade-dev)
@@ -38,34 +36,19 @@ public:
 	Stack(std::size_t capacity = constants::defaultCapacity);
 	Stack(Stack& stack);
 	~Stack();
-
 	bool isEmpty() noexcept;
-
 	void clear() noexcept;
-
 	void reallocate(std::size_t capacity) noexcept;
-
 	void push_back(const T& item) noexcept;
-
 	T pop();
-
 	T peek();
-
 	std::size_t getSize() noexcept;
-
 	std::size_t getCapacity() noexcept;
-
+	
 	Stack& operator=(Stack& s) noexcept;
 };
 
-class StackEmptyException : public std::exception
-{
-public:
-	const char* what() const noexcept override
-	{
-		return "Stack is empty";
-	}
-};
+
 
 template <class T>
 Stack<T>::Stack(std::size_t capacity) : m_capacity(capacity), m_size(0)

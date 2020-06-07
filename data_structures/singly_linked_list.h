@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <exception>
+#include "exceptions.h"
 
 /**
  * @author Dreadblade- (https://github.com/Dreadblade-dev)
@@ -45,20 +45,26 @@ public:
 	void deleteAtStart();
 	void deleteAtEnd();
 
-	SinglyLinkedList& operator=(SinglyLinkedList& list);
+	SinglyLinkedList<T>& operator=(SinglyLinkedList& list);
 	
-	template <class T>
-	friend std::ostream& operator<<(std::ostream& out, SinglyLinkedList<T>& list);
-};
-
-class ListEmptyException : public std::exception
-{
-public:
-	const char* what() const override
+	friend std::ostream& operator<<(std::ostream& out, SinglyLinkedList<T>& list)
 	{
-		return "List is empty";
+		if (list.isEmpty())
+			throw ListEmptyException();
+
+		auto currentNode = list.m_head;
+		while (currentNode->next != nullptr)
+		{
+			out << currentNode->data << ' ';
+			currentNode = currentNode->next;
+		}
+
+		out << currentNode->data;
+
+		return out;
 	}
 };
+
 
 template <class T>
 SinglyLinkedList<T>::SinglyLinkedList(): m_head(nullptr)
@@ -272,31 +278,12 @@ void SinglyLinkedList<T>::deleteAtEnd()
 	currentNode->next = nullptr;
 }
 
-
-template <class T>
-std::ostream& operator<<(std::ostream& out, SinglyLinkedList<T>& list)
-{
-	if (list.isEmpty())
-		throw ListEmptyException();
-
-	auto currentNode = list.m_head;
-	while (currentNode->next != nullptr)
-	{
-		out << currentNode->data << ' ';
-		currentNode = currentNode->next;
-	}
-
-	out << currentNode->data;
-
-	return out;
-}
-
 template <class T>
 SinglyLinkedList<T>& SinglyLinkedList<T>::operator=(SinglyLinkedList& list)
 {
 	if (this == &list)
 		return *this;
-	
+
 	if (list.isEmpty())
 	{
 		m_head = nullptr;
