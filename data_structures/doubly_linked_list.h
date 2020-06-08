@@ -34,14 +34,14 @@ class DoublyLinkedList
 private:
 	Node<T>* m_head;
 	Node<T>* m_tail;
-	
+
 public:
 	DoublyLinkedList();
 	DoublyLinkedList(DoublyLinkedList<T>& list);
 	~DoublyLinkedList();
 	bool isEmpty() noexcept;
 	bool contains(const T& item) noexcept;
-	void clear();
+	void clear() noexcept;
 	void remove(const T& item); 
 	void insertAtStart(const T& item) noexcept;
 	void insertAtEnd(const T& item) noexcept;
@@ -119,7 +119,17 @@ DoublyLinkedList<T>::DoublyLinkedList(DoublyLinkedList<T>& list)
 template <class T>
 DoublyLinkedList<T>::~DoublyLinkedList()
 {
+	if (isEmpty())
+		return;
 
+	auto currentNode = m_head;
+	while (currentNode->next != nullptr)
+	{
+		currentNode = currentNode->next;
+		delete currentNode->prev;
+	}
+
+	delete currentNode;
 }
 
 /**
@@ -156,7 +166,7 @@ bool DoublyLinkedList<T>::contains(const T& item) noexcept
  * Clears the list
  */
 template <class T>
-void DoublyLinkedList<T>::clear()
+void DoublyLinkedList<T>::clear() noexcept
 {
 	if (isEmpty())
 		return;

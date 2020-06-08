@@ -1,7 +1,3 @@
-#pragma once
-#include <iostream>
-#include "exceptions.h"
-
 /**
  * @author Dreadblade- (https://github.com/Dreadblade-dev)
  * Stack realization
@@ -15,25 +11,24 @@
  * Source: https://en.wikipedia.org/wiki/Stack_(abstract_data_type)
  */
 
-
-
-namespace constants
-{
-	static const std::size_t defaultCapacity = 16;
-	static const std::size_t extendedCapacity = 16;
-}
+#pragma once
+#include <iostream>
+#include "exceptions.h"
 
 template <class T>
 class Stack
 {
 private:
-
 	std::size_t m_capacity;
 	std::size_t m_size;
 	T* m_data;
-	
+	struct constants
+	{
+		static const std::size_t default_capacity = 16;
+		static const std::size_t extended_capacity = 16;
+	};
 public:
-	Stack(std::size_t capacity = constants::defaultCapacity);
+	Stack(std::size_t capacity = constants::default_capacity);
 	Stack(Stack& stack);
 	~Stack();
 	bool isEmpty() noexcept;
@@ -134,7 +129,7 @@ template <class T>
 void Stack<T>::push_back(const T& item) noexcept
 {
 	if ((m_size + 1) == m_capacity)
-		reallocate(m_capacity + constants::extendedCapacity);
+		reallocate(m_capacity + constants::extended_capacity);
 	m_data[m_size] = item;
 	++m_size;
 }
@@ -148,6 +143,11 @@ T Stack<T>::pop()
 	T tmp = m_data[m_size - 1];
 	--m_size;
 
+	if (m_size < m_capacity / 4)
+	{
+		reallocate(m_capacity / 2);
+	}
+	
 	return tmp;
 }
 

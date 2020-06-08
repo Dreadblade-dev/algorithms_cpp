@@ -18,3 +18,12 @@ public:
 		return "List is empty";
 	}
 };
+
+class QueueEmptyException : public std::exception
+{
+public:
+	const char* what() const noexcept override
+	{
+		return "Queue is empty";
+	}
+};
