@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @author Dreadblade- (https://github.com/Dreadblade-dev)
  * Doubly linked list realization
  *
@@ -13,6 +13,17 @@
  * point to some kind of terminator, typically a sentinel node or null,
  * to facilitate traversal of the list.
  *
+ * Time complexity:
+ * ┌───────────────┬───────────┬──────────┐
+ * │	    	   │ Insertion │ Deletion │
+ * │───────────────┼───────────┼──────────│
+ * │  At the start │	O(1)   │   O(1)   │
+ * │───────────────┼───────────┼──────────│
+ * │ In the middle │	O(1)   │   O(1)	  │
+ * │───────────────┼───────────┼──────────│
+ * │  At the end   │    O(1)   │   O(1)   │
+ * └───────────────┴───────────┴──────────┘
+ *
  * Source: https://en.wikipedia.org/wiki/Doubly_linked_list
  */
 
@@ -21,26 +32,28 @@
 #include "exceptions.h"
 
 template <class T>
-struct Node
-{
-	Node<T>* prev;
-	T data;
-	Node<T>* next;
-};
-
-template <class T>
 class DoublyLinkedList
 {
 private:
+	template <class T>
+	struct Node
+	{
+		Node<T>* prev;
+		T data;
+		Node<T>* next;
+	};
+	
 	Node<T>* m_head;
 	Node<T>* m_tail;
+	
 
 public:
 	DoublyLinkedList();
 	DoublyLinkedList(DoublyLinkedList<T>& list);
+	DoublyLinkedList(DoublyLinkedList<T>&& list) noexcept;
 	~DoublyLinkedList();
-	bool isEmpty() noexcept;
-	bool contains(const T& item) noexcept;
+	bool isEmpty() const noexcept;
+	bool contains(const T& item) const noexcept;
 	void clear() noexcept;
 	void remove(const T& item); 
 	void insertAtStart(const T& item) noexcept;
@@ -51,7 +64,14 @@ public:
 	void deleteAtEnd();
 	void reverse();
 
-	DoublyLinkedList<T>& operator=(DoublyLinkedList<T>& list);
+	DoublyLinkedList<T>& operator=(const DoublyLinkedList<T>& list);
+	DoublyLinkedList<T>& operator=(DoublyLinkedList<T>&& list) noexcept;
+
+	friend void swap(DoublyLinkedList<T>& l, DoublyLinkedList<T>& r) noexcept
+	{
+		std::swap(l.m_head, r.m_head);
+		std::swap(l.m_tail, r.m_tail);
+	}
 	
 	friend std::ostream& operator<<(std::ostream& out, DoublyLinkedList<T>& list)
 	{
@@ -79,7 +99,7 @@ DoublyLinkedList<T>::DoublyLinkedList(): m_head(nullptr), m_tail(nullptr)
 }
 
 /**
- * Copy constructor
+ * Copy assignment constructor
  */
 template <class T>
 DoublyLinkedList<T>::DoublyLinkedList(DoublyLinkedList<T>& list)
@@ -114,6 +134,15 @@ DoublyLinkedList<T>::DoublyLinkedList(DoublyLinkedList<T>& list)
 }
 
 /**
+ * Move assignment constructor
+ */
+template <class T>
+DoublyLinkedList<T>::DoublyLinkedList(DoublyLinkedList<T>&& list) noexcept
+{
+	swap(*this, list);
+}
+
+/**
  * Destructor
  */
 template <class T>
@@ -136,7 +165,7 @@ DoublyLinkedList<T>::~DoublyLinkedList()
  * Returns @true if the list is empty
  */
 template <class T>
-bool DoublyLinkedList<T>::isEmpty() noexcept
+bool DoublyLinkedList<T>::isEmpty() const noexcept
 {
 	return (m_head == nullptr);
 }
@@ -145,7 +174,7 @@ bool DoublyLinkedList<T>::isEmpty() noexcept
  * Returns @true if the list contains @item
  */
 template <class T>
-bool DoublyLinkedList<T>::contains(const T& item) noexcept
+bool DoublyLinkedList<T>::contains(const T& item) const noexcept
 {
 	if (isEmpty())
 		return false;
@@ -461,7 +490,7 @@ void DoublyLinkedList<T>::reverse()
  * Copy assignment operator
  */
 template <class T>
-DoublyLinkedList<T>& DoublyLinkedList<T>::operator=(DoublyLinkedList<T>& list)
+DoublyLinkedList<T>& DoublyLinkedList<T>::operator=(const DoublyLinkedList<T>& list)
 {
 	if (this == &list)
 		return *this;
@@ -494,5 +523,18 @@ DoublyLinkedList<T>& DoublyLinkedList<T>::operator=(DoublyLinkedList<T>& list)
 	currentNode->next = nullptr;
 	m_tail = currentNode;
 
+	return *this;
+}
+
+/**
+ * Move assignment operator
+ */
+template <class T>
+DoublyLinkedList<T>& DoublyLinkedList<T>::operator=(DoublyLinkedList<T>&& list) noexcept
+{
+	if (this == &list)
+		return *this;
+
+	swap(*this, list);
 	return *this;
 }

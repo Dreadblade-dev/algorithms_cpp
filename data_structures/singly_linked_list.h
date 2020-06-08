@@ -1,8 +1,4 @@
-#pragma once
-#include <iostream>
-#include "exceptions.h"
-
-/**
+﻿/**
  * @author Dreadblade- (https://github.com/Dreadblade-dev)
  * Singly linked list realization
  *
@@ -15,29 +11,45 @@
  * together represent a sequence.
  * 
  * In its most basic form, each node contains: data, and a reference
- * (in other words, a link) to the next node in the sequence. 
- *
+ * (in other words, a link) to the next node in the sequence.
+ * 
+ * Time complexity:
+ * ┌───────────────┬───────────┬──────────┐
+ * │	    	   │ Insertion │ Deletion │
+ * │───────────────┼───────────┼──────────│
+ * │  At the start │	O(1)   │   O(1)   │
+ * │───────────────┼───────────┼──────────│
+ * │ In the middle │		   │		  │
+ * │───────────────┼───────────┼──────────│
+ * │  At the end   │    O(1)   │   O(1)   │
+ * └───────────────┴───────────┴──────────┘
+ * 
  * Source: https://en.wikipedia.org/wiki/Linked_list
  */
 
-template <class T>
-struct Node
-{
-	Node<T>* next;
-	T data;
-};
+#pragma once
+#include <iostream>
+#include "exceptions.h"
 
 template <class T>
 class SinglyLinkedList
 {
 private:
+	template <class T>
+	struct Node
+	{
+		Node<T>* next;
+		T data;
+	};
+	
 	Node<T>* m_head;
 public:
 	SinglyLinkedList();
-	SinglyLinkedList(SinglyLinkedList& list);
+	SinglyLinkedList(SinglyLinkedList<T>& list);
+	SinglyLinkedList(SinglyLinkedList<T>&& list) noexcept;
 	~SinglyLinkedList();
-	bool isEmpty() noexcept;
-	bool contains(const T& item) noexcept;
+	bool isEmpty() const noexcept;
+	bool contains(const T& item) const noexcept;
 	void clear() noexcept;
 	void remove(const T& item);
 	void insertAtStart(const T& item) noexcept;
@@ -45,7 +57,13 @@ public:
 	void deleteAtStart();
 	void deleteAtEnd();
 
-	SinglyLinkedList<T>& operator=(SinglyLinkedList& list);
+	SinglyLinkedList<T>& operator=(const SinglyLinkedList& list);
+	SinglyLinkedList<T>& operator=(SinglyLinkedList<T>&& list) noexcept;
+
+	friend void swap(SinglyLinkedList<T>& l, SinglyLinkedList<T>& r) noexcept
+	{
+		std::swap(l.m_head, r.m_head);
+	}
 	
 	friend std::ostream& operator<<(std::ostream& out, SinglyLinkedList<T>& list)
 	{
@@ -65,13 +83,18 @@ public:
 	}
 };
 
-
+/**
+ * Default constructor, creates empty list
+ */
 template <class T>
 SinglyLinkedList<T>::SinglyLinkedList(): m_head(nullptr)
 {
 
 }
 
+/**
+ * Copy constructor
+ */
 template <class T>
 SinglyLinkedList<T>::SinglyLinkedList(SinglyLinkedList& list)
 {
@@ -102,7 +125,18 @@ SinglyLinkedList<T>::SinglyLinkedList(SinglyLinkedList& list)
 	currentNode->next = nullptr;
 }
 
+/**
+ * Move assignment constructor
+ */
+template <class T>
+SinglyLinkedList<T>::SinglyLinkedList(SinglyLinkedList<T>&& list) noexcept
+{
+	swap(*this, list);
+}
 
+/**
+ * Destructor
+ */
 template <class T>
 SinglyLinkedList<T>::~SinglyLinkedList()
 {
@@ -121,14 +155,20 @@ SinglyLinkedList<T>::~SinglyLinkedList()
 	}
 }
 
+/**
+ * Returns @true if the list is empty
+ */
 template <class T>
-bool SinglyLinkedList<T>::isEmpty() noexcept
+bool SinglyLinkedList<T>::isEmpty() const noexcept
 {
 	return (m_head == nullptr);
 }
 
+/**
+ * Returns @true if the list contains @item
+ */
 template <class T>
-bool SinglyLinkedList<T>::contains(const T& item) noexcept
+bool SinglyLinkedList<T>::contains(const T& item) const noexcept
 {
 	if (isEmpty())
 		return false;
@@ -150,6 +190,9 @@ bool SinglyLinkedList<T>::contains(const T& item) noexcept
 	return false;
 }
 
+/**
+ * Clears the list
+ */
 template <class T>
 void SinglyLinkedList<T>::clear() noexcept
 {
@@ -169,6 +212,9 @@ void SinglyLinkedList<T>::clear() noexcept
 	m_head = nullptr;
 }
 
+/**
+ * Removes a node with @item from the list
+ */
 template <class T>
 void SinglyLinkedList<T>::remove(const T& item)
 {
@@ -207,6 +253,9 @@ void SinglyLinkedList<T>::remove(const T& item)
 	}
 }
 
+/**
+ * Inserts a new node with @item at the start
+ */
 template <class T>
 void SinglyLinkedList<T>::insertAtStart(const T& item) noexcept
 {
@@ -227,6 +276,9 @@ void SinglyLinkedList<T>::insertAtStart(const T& item) noexcept
 	}
 }
 
+/**
+ * Inserts a new node with @item at the end
+ */
 template <class T>
 void SinglyLinkedList<T>::insertAtEnd(const T& item) noexcept
 {
@@ -246,6 +298,9 @@ void SinglyLinkedList<T>::insertAtEnd(const T& item) noexcept
 		insertAtStart(item);
 }
 
+/**
+ * Deletes the node at the start of the list
+ */
 template <class T>
 void SinglyLinkedList<T>::deleteAtStart()
 {
@@ -257,6 +312,9 @@ void SinglyLinkedList<T>::deleteAtStart()
 	m_head = tmp;
 }
 
+/**
+ * Deletes the node at the end of the list
+ */
 template <class T>
 void SinglyLinkedList<T>::deleteAtEnd()
 {
@@ -278,8 +336,11 @@ void SinglyLinkedList<T>::deleteAtEnd()
 	currentNode->next = nullptr;
 }
 
+/**
+ * Copy assignment operator
+ */
 template <class T>
-SinglyLinkedList<T>& SinglyLinkedList<T>::operator=(SinglyLinkedList& list)
+SinglyLinkedList<T>& SinglyLinkedList<T>::operator=(const SinglyLinkedList& list)
 {
 	if (this == &list)
 		return *this;
@@ -310,5 +371,18 @@ SinglyLinkedList<T>& SinglyLinkedList<T>::operator=(SinglyLinkedList& list)
 	}
 	currentNode->next = nullptr;
 
+	return *this;
+}
+
+/**
+ * Move assignment operator
+ */
+template <class T>
+SinglyLinkedList<T>& SinglyLinkedList<T>::operator=(SinglyLinkedList<T>&& list) noexcept
+{
+	if (this == &list)
+		return *this;
+
+	swap(*this, list);
 	return *this;
 }
