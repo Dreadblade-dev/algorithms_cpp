@@ -45,7 +45,6 @@ private:
 	
 	Node<T>* m_head;
 	Node<T>* m_tail;
-	
 
 public:
 	DoublyLinkedList();
@@ -522,7 +521,7 @@ DoublyLinkedList<T>& DoublyLinkedList<T>::operator=(const DoublyLinkedList<T>& l
 	}
 	currentNode->next = nullptr;
 	m_tail = currentNode;
-
+	
 	return *this;
 }
 
