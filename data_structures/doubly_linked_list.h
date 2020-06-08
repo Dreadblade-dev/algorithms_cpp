@@ -34,7 +34,7 @@ class DoublyLinkedList
 private:
 	Node<T>* m_head;
 	Node<T>* m_tail;
-	
+
 public:
 	DoublyLinkedList();
 	DoublyLinkedList(DoublyLinkedList<T>& list);
@@ -119,7 +119,17 @@ DoublyLinkedList<T>::DoublyLinkedList(DoublyLinkedList<T>& list)
 template <class T>
 DoublyLinkedList<T>::~DoublyLinkedList()
 {
+	if (isEmpty())
+		return;
 
+	auto currentNode = m_head;
+	while (currentNode->next != nullptr)
+	{
+		currentNode = currentNode->next;
+		delete currentNode->prev;
+	}
+
+	delete currentNode;
 }
 
 /**
